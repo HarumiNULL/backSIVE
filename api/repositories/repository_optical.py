@@ -9,15 +9,13 @@ class RepositoryOptical:
             return Optical.objects.get(id_optical=id_optical)
         except Optical.DoesNotExist:
             return None
-    
-
+        
     def create_optical(self,**kwargs):
         optical = Optical(**kwargs)
         optical.save()
         return optical
 
-    def update_optical(self,id_optical, **kwargs):
-        optical = RepositoryOptical.get_optical_by_id(id_optical)
+    def update_optical(self,optical, *args, **kwargs):
         if optical:
             for key, value in kwargs.items():
                 setattr(optical, key, value)
@@ -26,8 +24,7 @@ class RepositoryOptical:
         return None
     
     
-    def delete_optical(self,id_optical):
-        optical = RepositoryOptical.get_optical_by_id(id_optical)
+    def delete_optical(self,optical):
         if optical:
             optical.delete()
             return True

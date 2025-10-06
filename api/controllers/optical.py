@@ -41,11 +41,12 @@ class OpticalController(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # PUT → actualizar óptica existente
-    def put(self, request, pk, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, partial=True)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             try:
-                optical = self.service.update_optical(pk, serializer.validated_data)
+                pk = serializer.data.get('pk')
+                optical = self.service.update_optical(pk, serializer.data)
                 if not optical:
                     return Response({"error": "Óptica no encontrada"}, status=status.HTTP_404_NOT_FOUND)
                 return Response(self.serializer_class(optical).data)
@@ -54,8 +55,10 @@ class OpticalController(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # DELETE → eliminar óptica
-    def delete(self, request, pk, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         try:
+            pk = request.data.get('pk')
+            
             deleted = self.service.delete_optical(pk)
             if deleted:
                 return Response(status=status.HTTP_204_NO_CONTENT)
