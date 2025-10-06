@@ -7,3 +7,5 @@ class City(models.Model):
     class Meta: 
         managed = True
         db_table = 'city'
+    def __str__(self):
+        return self.name

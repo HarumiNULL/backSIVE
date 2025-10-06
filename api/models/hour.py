@@ -6,4 +6,6 @@ class Hour(models.Model):
     
     class Meta: 
         managed = True
-        db_table = 'hour' 
+        db_table = 'hour'
+    def __str__(self):    
+        return str(self.hour)

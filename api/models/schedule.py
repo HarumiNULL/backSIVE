@@ -11,3 +11,6 @@ class Schedule(models.Model):
     class Meta: 
         managed = True
         db_table = 'schedule'
+    def __str__(self):
+        return f"{self.day} {self.hour_aper} - {self.hour_close}"   
+        
