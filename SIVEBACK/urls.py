@@ -18,6 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from knox import views as knox_views
+from api.controllers.optical import OpticalController
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -25,5 +26,8 @@ urlpatterns = [
     path('api/SIVEBACK/',include('knox.urls')),
     path('api/logout/',knox_views.LogoutView.as_view(), name='knox_logout'), 
     path('api/logoutall/',knox_views.LogoutAllView.as_view(), name='knox_logoutall'), 
-    path('api/password_reset/',include('django_rest_passwordreset.urls', namespace='password_reset')), 
+    path('api/password_reset/',include('django_rest_passwordreset.urls', namespace='password_reset')),
+    path('api/optical/', OpticalController.as_view(), name= 'optical'), # Asegúrate de importar OpticalController),
+    path('api/optical/update', OpticalController.as_view(), name= 'optical_list_create'), # Asegúrate de importar OpticalController),
+    path('optical/<int:pk>/', OpticalController.as_view(), name= 'optical_detail'),# Asegúrate de importar OpticalController
 ]

@@ -15,7 +15,10 @@ class Optical(models.Model):
     user = models.ForeignKey(User, models.CASCADE, db_column='id')
     certCadecuacion = models.CharField(max_length=500)
     certDispensacion = models.CharField(max_length=500)
-    view = models.IntegerField
+    latitud = models.FloatField(default=0.0)
+    longitud = models.FloatField(default=0.0)
+    view = models.IntegerField(default=0)
+    
     
     class Meta: 
         managed = True
