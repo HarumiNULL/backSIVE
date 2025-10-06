@@ -15,11 +15,10 @@ class OpticalService:
         return self.repository.create_optical(**data)
 
     
-    def update_optical(self, optical_id, data):
-        optical = self.repository.get_optical_by_id(optical_id)
+    def update_optical(self, optical, data):
         if not optical:
             raise ValueError("Óptica no encontrada para modificar.")
-        return self.repository.update_optical(optical, data)
+        return self.repository.update_optical(optical, **data)
     
     
     def delete_optical(self, optical_id):

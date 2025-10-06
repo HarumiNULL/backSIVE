@@ -60,8 +60,8 @@ class OpticalController(generics.GenericAPIView):
         serializer = self.list_serializer_class(optical, data=request.data, partial=True)
         if serializer.is_valid():
             try:
-                optical = self.service.update_optical(pk, serializer.validated_data)
-                return Response(self.list_serializer_class(optical).data)
+                optical_updated = self.service.update_optical(optical, serializer.validated_data)
+                return Response(self.list_serializer_class(optical_updated).data)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
