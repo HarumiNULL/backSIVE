@@ -4,6 +4,7 @@ from .question import Question
 class Option(models.Model):
     id_option = models.AutoField(primary_key=True)
     question = models.ForeignKey(Question, models.DO_NOTHING,db_column='id_question')
+    descriptionOp = models.CharField(max_length=500, default='Sin descripción')
     correct = models.BinaryField
     
     class Meta: 
