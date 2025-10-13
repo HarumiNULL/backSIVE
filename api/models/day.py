@@ -7,3 +7,5 @@ class Day(models.Model):
     class Meta: 
         managed = True
         db_table = 'day'
+    def __str__(self):
+        return self.name_day
