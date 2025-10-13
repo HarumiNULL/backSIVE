@@ -53,12 +53,25 @@ class QuestionaryController(generics.GenericAPIView):
 
     # PUT → actualizar cuestionario existente
     def patch(self, request, pk, *args, **kwargs):
-        try:
-            questionary = self.service.update_questionary(pk)
-            if not questionary:
-                return Response({"error": "Cuestionario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
-        except questionary.DoesNotExist:
+        questionary_instance = self.service.list_questionary(pk)
+        if not questionary_instance:
             return Response({"error": "Cuestionario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.create_serializer_class(
+            questionary_instance, data=request.data, partial=True
+        )
+        if serializer.is_valid():
+            updated_questionary = serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # DELETE → eliminar cuestionario existente
+    def delete(self, request, pk, *args, **kwargs):
+        questionary_instance = self.service.list_questionary(pk)
+        if not questionary_instance:
+            return Response({"error": "Cuestionario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        questionary_instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
         
     
 
