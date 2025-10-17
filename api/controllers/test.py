@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import generics, status, permissions
 
 
-class TestController(generics.GenericAPIView):
+class TestControllerCreate(generics.GenericAPIView):
     serializer_class = TestSerializers
     create_serializer_class = TestCreateSerializers
     delete_serializer_class = TestDeleteSerializers
@@ -22,20 +22,11 @@ class TestController(generics.GenericAPIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = test_service.TestService()
-
-    # GET → listar todas o una por id
+    # GET → listar todos los tests
     def get(self, request, *args, **kwargs):
-        id_test = kwargs.get('pk', None)
-        if id_test:
-            test = self.service.list_test(id_test) 
-            if not test:
-                return Response({"error": "Test no encontrado"}, status=status.HTTP_404_NOT_FOUND)
-            serializer = self.serializer_class(test)
-            return Response(serializer.data)
-        else:
-            tests = self.service.list_tests()
-            serializer = self.serializer_class(tests, many=True)
-            return Response(serializer.data)
+        tests = self.service.list_tests()
+        serializer = self.serializer_class(tests, many=True)
+        return Response(serializer.data)
 
     # POST → crear nuevo test
     def post(self, request, *args, **kwargs):
@@ -48,11 +39,31 @@ class TestController(generics.GenericAPIView):
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class TestControllerList(generics.GenericAPIView):
+    serializer_class = TestSerializers
+    queryset = Test.objects.all()
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = test_service.TestService()
+
+    # GET → listar por id
+    def get(self, request, *args, **kwargs):
+        id_test = kwargs.get('pk', None)
+        if id_test:
+            test = self.service.get_test_by_id(id_test) 
+            if not test:
+                return Response({"error": "Test no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+            serializer = self.serializer_class(test)
+            return Response(serializer.data)
+    
     # DELETE → eliminar test existente
     def delete(self, request, pk, *args, **kwargs):
         try:
             self.service.delete_test(pk)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_200_OK)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+    

@@ -21,6 +21,6 @@ urlpatterns = [
     path('logout/',knox_views.LogoutView.as_view(), name='knox_logout'), 
     path('logoutall/',knox_views.LogoutAllView.as_view(), name='knox_logoutall'), 
     path('password_reset/',include('django_rest_passwordreset.urls', namespace='password_reset')),
-    path ('test/',ctrl.TestController.as_view(), name='test'),
-    path ('test/<int:pk>/',ctrl.TestController.as_view(), name='test_detail'), 
+    path ('test/',ctrl.TestControllerCreate.as_view(), name='test'),
+    path ('test/<int:pk>/',ctrl.TestControllerList.as_view(), name='test_detail'), 
 ]

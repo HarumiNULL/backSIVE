@@ -1,3 +1,4 @@
+from api.models.test import Test
 from api.repositories import RepositoryTest
 from api.models import Questionary, User
 
@@ -20,7 +21,12 @@ class TestService:
             raise ValueError(f"Usuario con ID {validated_data["user_id"]} no encontrado.")
           
     def delete_test(self, test_id):
-        test_instance = self.repository.get_test_by_id(test_id)
-        if test_instance:
-            return self.repository.delete_test(test_instance)
-        raise ValueError("Test no encontrado para eliminar.")
+        try: 
+            test = Test.objects.get(id_test=test_id)
+            test.delete()
+        except Test.DoesNotExist:
+            raise ValueError("Test no encontrado para eliminar.")
+        #test_instance = self.repository.get_test_by_id(test_id)
+        #if test_instance:
+         #   return self.repository.delete_test(test_instance)
+        #raise ValueError("Test no encontrado para eliminar.")
