@@ -8,6 +8,9 @@ class OpticalService:
     def list_optical(self):
         return self.repository.list()
     
+    def get_optical(self, optical_id):
+        return self.repository.get_optical_by_id(optical_id)
+    
     
     def create_optical(self, data):
         if "nameOp" not in data or "email" not in data or "address" not in data:

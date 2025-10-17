@@ -5,8 +5,8 @@ from knox import views as knox_views
 urlpatterns = [
     path("register/", ctrl.APIRegister.as_view(), name="register"),
     path("login/", ctrl.APILogin.as_view(), name="login"),
-    path("optical/", ctrl.OpticalController.as_view(), name="optical"),
-    path("optical/<int:pk>/", ctrl.OpticalController.as_view(), name="optical_detail"),
+    path("optical/", ctrl.OpticalControllerCreate.as_view(), name="optical"),
+    path("optical/<int:pk>/", ctrl.OpticalControllerList.as_view(), name="optical_detail"),
     path("optical/<int:pk>/increment_view/", ctrl.OpticalIncrementViewController.as_view(), name="optical_increment_view"),
     path("days/", ctrl.DayController.as_view(), name="days"),
     path("hours/", ctrl.HourController.as_view(), name="hours"),

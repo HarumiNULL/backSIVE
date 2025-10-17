@@ -7,34 +7,25 @@ from api.serializers import DaySerializers
 from api.serializers import HourSerializers
 from api.serializers import ScheduleSerializers
 from django.db.models import F
-class OpticalController(generics.GenericAPIView):
+class OpticalControllerCreate(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
-    create_serializer_class = OpticalCreateSerializers
-    list_serializer_class = OpticalListSerializers
-    queryset = Optical.objects.all()
     
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.service = OpticalService() 
-        
+    def get_queryset(self):
+        return Optical.objects.all()
+            
     def get_serializer_class(self):
-        if self.action == 'post':
+        if self.request.method == 'POST':
             return OpticalCreateSerializers
         return OpticalListSerializers
+    
+    def __init__(self, **kwargs):
+        self.service = OpticalService()
+        super().__init__(**kwargs)  
 
-    # GET → listar todas o una por id
     def get(self, request, *args, **kwargs):
-        id_optical = kwargs.get('pk', None)
-        if id_optical:
-            optical = self.service.repository.get_optical_by_id(id_optical)
-            if not optical:
-                return Response({"error": "Óptica no encontrada"}, status=status.HTTP_404_NOT_FOUND)
-            serializer = self.list_serializer_class(optical)
-            return Response(serializer.data)
-        else:
-            opticals = self.service.list_optical()
-            serializer = self.list_serializer_class(opticals, many=True)
-            return Response(serializer.data)
+        optics = self.service.repository.list()
+        serializer = self.list_serializer_class(optics, many=True)
+        return Response(serializer.data)
 
     # POST → crear nueva óptica
     def post(self, request, *args, **kwargs):
@@ -49,6 +40,25 @@ class OpticalController(generics.GenericAPIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class OpticalControllerList(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = OpticalListSerializers
+    queryset = Optical.objects.all()
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = OpticalService()
+
+    # GET → listar una por id
+    def get(self, request, *args, **kwargs):
+        id_optical = kwargs.get('pk', None)
+        if id_optical:
+            optical = self.service.get_optical(id_optical)
+            if not optical:
+                return Response({"error": "Óptica no encontrada"}, status=status.HTTP_404_NOT_FOUND)
+            serializer = self.serializer_class(optical)
+            return Response(serializer.data)
+    
     # PUT → actualizar óptica existente
     def patch(self, request, pk, *args, **kwargs):
         try:
@@ -57,11 +67,11 @@ class OpticalController(generics.GenericAPIView):
                 return Response({"error": "Óptica no encontrada"}, status=status.HTTP_404_NOT_FOUND)
         except Optical.DoesNotExist:
             return Response({"error": "Óptica no encontrada"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = self.list_serializer_class(optical, data=request.data, partial=True)
+        serializer = self.serializer_class(optical, data=request.data, partial=True)
         if serializer.is_valid():
             try:
                 optical_updated = self.service.update_optical(optical, serializer.validated_data)
-                return Response(self.list_serializer_class(optical_updated).data)
+                return Response(self.serializer_class(optical_updated).data)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -75,6 +85,7 @@ class OpticalController(generics.GenericAPIView):
             return Response({"error": "Óptica no encontrada"}, status=status.HTTP_404_NOT_FOUND)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class OpticalIncrementViewController(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
