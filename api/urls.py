@@ -23,4 +23,6 @@ urlpatterns = [
     path('password_reset/',include('django_rest_passwordreset.urls', namespace='password_reset')),
     path ('test/',ctrl.TestControllerCreate.as_view(), name='test'),
     path ('test/<int:pk>/',ctrl.TestControllerList.as_view(), name='test_detail'), 
+    path('catalogue/', ctrl.CatalogueControllerCreate.as_view(), name='catalogue'),
+    path('catalogue/<int:pk>/', ctrl.CatalogueControllerList.as_view(), name='catalogue_detail'),
 ]
