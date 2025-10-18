@@ -1,36 +1,24 @@
 from api.models import Questionary, Question, Option
-from rest_framework import serializers  
+from rest_framework import serializers
 from api.services import  QuestionaryService, QuestionService, OptionService
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from api.serializers import QuestionaryCreateSerializers, QuestionaryListSerializers, QuestionCreateSerializers, QuestionListSerializers, OptionCreateSerializers, OptionListSerializers
-class QuestionaryController(generics.GenericAPIView):
+class QuestionaryControllerCreate(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     create_serializer_class = QuestionaryCreateSerializers
     list_serializer_class = QuestionaryListSerializers
     queryset = Questionary.objects.all()
-    
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.service = QuestionaryService() 
+        self.service = QuestionaryService()
 
-    # GET → listar todas o una por id
+    # GET → listar todas los cuestionarios
     def get(self, request, *args, **kwargs):
-        id_questionary = kwargs.get('pk', None)
-        if id_questionary:
-            # Llama al método específico para obtener por ID
-            questionary = self.service.list_questionary(id_questionary) 
-            if not questionary:
-                return Response({"error": "Cuestionario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
-            # Usas tu serializador para un solo objeto (many=False por defecto)
-            serializer = self.list_serializer_class(questionary)
-            return Response(serializer.data)
-        else:
-            # Llama al método para obtener la lista completa
-            questionarys = self.service.list_questionary()
-            # Usas tu serializador para una lista de objetos (many=True)
-            serializer = self.list_serializer_class(questionarys, many=True)
-            return Response(serializer.data)
+        questionarys = self.service.list_questionary()
+        serializer = self.list_serializer_class(questionarys, many=True)
+        return Response(serializer.data)
 
     # POST → crear nuevo cuestionario
     def post(self, request, *args, **kwargs):
@@ -45,7 +33,25 @@ class QuestionaryController(generics.GenericAPIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # PUT → actualizar cuestionario existente
+class QuestionaryControllerList(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = QuestionaryListSerializers
+    queryset = Questionary.objects.all()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = QuestionaryService()
+
+    # GET → listar una por id
+    def get(self, request, *args, **kwargs):
+        id_questionary = kwargs.get('pk', None)
+        if id_questionary:
+            questionary = self.service.list_questionary(id_questionary)
+            if not questionary:
+                return Response({"error": "Cuestionario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+            serializer = self.serializer_class(questionary)
+            return Response(serializer.data)
+
     def patch(self, request, pk, *args, **kwargs):
         questionary_instance = self.service.list_questionary(pk)
         if not questionary_instance:
@@ -65,31 +71,23 @@ class QuestionaryController(generics.GenericAPIView):
             return Response({"error": "Cuestionario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
         questionary_instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
-class QuestionController(generics.GenericAPIView):
+
+class QuestionControllerCreate(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = QuestionListSerializers
     create_serializer_class = QuestionCreateSerializers
     list_serializer_class = QuestionListSerializers
     queryset = Question.objects.all()
-    
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = QuestionService()
 
     def get(self, request, *args, **kwargs):
-        id_question = kwargs.get('pk', None)
-        if id_question:
-            question = self.service.list_question(id_question) 
-            if not question:
-                return Response({"error": "Pregunta no encontrada"}, status=status.HTTP_404_NOT_FOUND)
-            serializer = self.list_serializer_class(question)
-            return Response(serializer.data)
-        else:
-            questions = self.service.list_question()
-            serializer = self.list_serializer_class(questions, many=True)
-            return Response(serializer.data)
-        
+        questions = self.service.list_question()
+        serializer = self.list_serializer_class(questions, many=True)
+        return Response(serializer.data)
+
     def post(self, request, *args, **kwargs):
         serializer = self.create_serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -100,7 +98,27 @@ class QuestionController(generics.GenericAPIView):
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+class QuestionControllerList(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = QuestionListSerializers
+    create_serializer_class = QuestionCreateSerializers
+    list_serializer_class = QuestionListSerializers
+    queryset = Question.objects.all()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = QuestionService()
+
+    def get(self, request, *args, **kwargs):
+        id_question = kwargs.get('pk', None)
+        if id_question:
+            question = self.service.list_question(id_question)
+            if not question:
+                return Response({"error": "Pregunta no encontrada"}, status=status.HTTP_404_NOT_FOUND)
+            serializer = self.list_serializer_class(question)
+            return Response(serializer.data)
+
     def patch(self, request, pk, *args, **kwargs):
         question_instance = self.service.list_question(pk)
         if not question_instance:
@@ -119,31 +137,23 @@ class QuestionController(generics.GenericAPIView):
             return Response({"error": "Pregunta no encontrada"}, status=status.HTTP_404_NOT_FOUND)
         question_instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
-class OptionController(generics.GenericAPIView):
+
+class OptionControllerCreate(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = OptionListSerializers
     create_serializer_class = OptionCreateSerializers
     list_serializer_class = OptionListSerializers
     queryset = Option.objects.all()
-    
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.service = OptionService()     
+        self.service = OptionService()
 
     def get(self, request, *args, **kwargs):
-        id_option = kwargs.get('pk', None)
-        if id_option:
-            option = self.service.list_option(id_option) 
-            if not option:
-                return Response({"error": "Opción no encontrada"}, status=status.HTTP_404_NOT_FOUND)
-            serializer = self.list_serializer_class(option)
-            return Response(serializer.data)
-        else:
-            options = self.service.list_option()
-            serializer = self.list_serializer_class(options, many=True)
-            return Response(serializer.data)
-        
+      options = self.service.list_option()
+      serializer = self.list_serializer_class(options, many=True)
+      return Response(serializer.data)
+
     def post(self, request, *args, **kwargs):
         serializer = self.create_serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -154,7 +164,27 @@ class OptionController(generics.GenericAPIView):
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+class OptionControllerList(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = OptionListSerializers
+    create_serializer_class = OptionCreateSerializers
+    list_serializer_class = OptionListSerializers
+    queryset = Option.objects.all()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = OptionService()
+
+    def get(self, request, *args, **kwargs):
+        id_option = kwargs.get('pk', None)
+        if id_option:
+            option = self.service.list_option(id_option)
+            if not option:
+                return Response({"error": "Opción no encontrada"}, status=status.HTTP_404_NOT_FOUND)
+            serializer = self.list_serializer_class(option)
+            return Response(serializer.data)
+
     def patch(self, request, pk, *args, **kwargs):
         option_instance = self.service.list_option(pk)
         if not option_instance:

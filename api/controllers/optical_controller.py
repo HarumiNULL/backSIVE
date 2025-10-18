@@ -112,25 +112,16 @@ class HourController(generics.GenericAPIView):
         serializer = HourSerializers(hours, many=True)
         return Response(serializer.data)
 
-class ScheduleController(generics.GenericAPIView):
+class ScheduleControllerCreate(generics.GenericAPIView):
     #permission_classes = [permissions.AllowAny]
     serializer_class = ScheduleSerializers
     queryset = Schedule.objects.all()
 
-   # 🔹 GET → Listar todos o uno por id
+   # 🔹 GET → Listar todos
     def get(self, request, *args, **kwargs):
-        pk = kwargs.get('pk', None)
-        if pk:
-            try:
-                schedule = Schedule.objects.get(pk=pk)
-                serializer = ScheduleSerializers(schedule)
-                return Response(serializer.data)
-            except Schedule.DoesNotExist:
-                return Response({'error': 'Horario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            schedules = Schedule.objects.all()
-            serializer = ScheduleSerializers(schedules, many=True)
-            return Response(serializer.data)
+      schedules = Schedule.objects.all()
+      serializer = ScheduleSerializers(schedules, many=True)
+      return Response(serializer.data)
 
     # 🔹 POST → Crear nuevo horario
     def post(self, request, *args, **kwargs):
@@ -139,6 +130,17 @@ class ScheduleController(generics.GenericAPIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ScheduleControllerList(generics.GenericAPIView):
+    def get(self, request, *args, **kwargs):
+        id_schedule = kwargs.get('pk', None)
+        if id_schedule:
+            try:
+                schedule = Schedule.objects.get(pk=id_schedule)
+            except Schedule.DoesNotExist:
+                return Response({'error': 'Horario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+            serializer = ScheduleSerializers(schedule)
+            return Response(serializer.data)
 
     # 🔹 PUT → Actualizar horario existente
     def put(self, request, pk, *args, **kwargs):
