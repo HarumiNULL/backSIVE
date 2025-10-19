@@ -116,6 +116,16 @@ class ScheduleControllerCreate(generics.GenericAPIView):
     #permission_classes = [permissions.AllowAny]
     serializer_class = ScheduleSerializers
     queryset = Schedule.objects.all()
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return ScheduleSerializers
+        elif self.request.method == 'GET':
+            return ScheduleSerializers
+        return ScheduleSerializers
 
    # 🔹 GET → Listar todos
     def get(self, request, *args, **kwargs):
@@ -132,6 +142,7 @@ class ScheduleControllerCreate(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ScheduleControllerList(generics.GenericAPIView):
+    serializer_class = ScheduleSerializers
     def get(self, request, *args, **kwargs):
         id_schedule = kwargs.get('pk', None)
         if id_schedule:
@@ -141,6 +152,16 @@ class ScheduleControllerList(generics.GenericAPIView):
                 return Response({'error': 'Horario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
             serializer = ScheduleSerializers(schedule)
             return Response(serializer.data)
+        
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    
+    def get_serializer_class(self):
+        if self.request.method == 'PUT':
+            return ScheduleSerializers
+        elif self.request.method == 'DELETE':
+            return ScheduleSerializers
+        return ScheduleSerializers
 
     # 🔹 PUT → Actualizar horario existente
     def put(self, request, pk, *args, **kwargs):

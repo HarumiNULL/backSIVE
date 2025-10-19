@@ -9,5 +9,5 @@ class CatalogueCreateSerializers(serializers.ModelSerializer):
 class CatalogueListSerializers(serializers.ModelSerializer):
   class Meta:
     model = Catalogue
-    fields = ['id_catalogue', 'nameP', 'description', 'price', 'image']
+    fields = ['id_catalogue','optical', 'nameP', 'description', 'price', 'image']
     read_only_fields = ['id_catalogue']

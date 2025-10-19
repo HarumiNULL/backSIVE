@@ -5,24 +5,24 @@ class QuestionaryCreateSerializers(serializers.ModelSerializer):
     class Meta: 
         model = Questionary
         fields = ['name_questionary', 'description', 'Author']
-
-
         
 class QuestionCreateSerializers(serializers.ModelSerializer):
+    questionary_id = serializers.IntegerField()
     class Meta: 
         model = Question
-        fields = ['question', 'image_question', 'questionary']
+        fields = ['questionary_id','question', 'image_question']
 
 class OptionCreateSerializers(serializers.ModelSerializer):
     question_id = serializers.IntegerField()
     class Meta: 
-        model = Option
+        model = Option 
         fields = ['question_id','descriptionOp']
 
 class OptionListSerializers(serializers.ModelSerializer):
+    question_id = serializers.IntegerField()
     class Meta: 
         model = Option
-        fields = ['id_option', 'descriptionOp']
+        fields = ['id_option','question_id', 'descriptionOp']
         read_only_fields = ['id_option']
         
 class QuestionListSerializers(serializers.ModelSerializer):

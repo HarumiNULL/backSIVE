@@ -13,6 +13,13 @@ class QuestionaryControllerCreate(generics.GenericAPIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = QuestionaryService()
+        
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return self.create_serializer_class
+        elif self.request.method == 'GET':
+            return self.list_serializer_class
+        return QuestionaryListSerializers
 
     # GET → listar todas los cuestionarios
     def get(self, request, *args, **kwargs):
@@ -36,11 +43,17 @@ class QuestionaryControllerCreate(generics.GenericAPIView):
 class QuestionaryControllerList(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = QuestionaryListSerializers
+    create_serializer_class = QuestionaryCreateSerializers
     queryset = Questionary.objects.all()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = QuestionaryService()
+    
+    def get_serializer_class(self):
+        if self.request.method == 'PATCH':
+            return QuestionaryCreateSerializers
+        return QuestionaryListSerializers
 
     # GET → listar una por id
     def get(self, request, *args, **kwargs):
@@ -77,11 +90,19 @@ class QuestionControllerCreate(generics.GenericAPIView):
     serializer_class = QuestionListSerializers
     create_serializer_class = QuestionCreateSerializers
     list_serializer_class = QuestionListSerializers
+    
     queryset = Question.objects.all()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = QuestionService()
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return self.create_serializer_class
+        elif self.request.method == 'GET':
+            return self.list_serializer_class
+        return QuestionListSerializers
 
     def get(self, request, *args, **kwargs):
         questions = self.service.list_question()
@@ -104,11 +125,19 @@ class QuestionControllerList(generics.GenericAPIView):
     serializer_class = QuestionListSerializers
     create_serializer_class = QuestionCreateSerializers
     list_serializer_class = QuestionListSerializers
+    delete_serializer_class = QuestionListSerializers
     queryset = Question.objects.all()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = QuestionService()
+    
+    def get_serializer_class(self):
+        if self.request.method == 'PATCH':
+            return self.create_serializer_class
+        elif self.request.method == 'DELETE':
+            return self.delete_serializer_class
+        return QuestionListSerializers
 
     def get(self, request, *args, **kwargs):
         id_question = kwargs.get('pk', None)
