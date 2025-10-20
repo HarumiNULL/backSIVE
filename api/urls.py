@@ -5,8 +5,10 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register('comment', ctrl.CommentController, basename='comment')
+router.register('service', ctrl.ServiceController, basename='service')
 
 urlpatterns = [
+    path('', include(router.urls)),
     path('', include(router.urls)),
     path("register/", ctrl.APIRegister.as_view(), name="register"),
     path("login/", ctrl.APILogin.as_view(), name="login"),

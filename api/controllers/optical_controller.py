@@ -1,12 +1,12 @@
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status, permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from api.services import OpticalService
-from api.models import Optical, Day, Hour, Schedule, City
+from api.models import Optical, Day, Hour, Schedule, City, Service
 from api.serializers import OpticalListSerializers, OpticalCreateSerializers, CitySerializers 
 from api.serializers import DaySerializers
 from api.serializers import HourSerializers
-from api.serializers import ScheduleSerializers
+from api.serializers import ScheduleSerializers, ServiceSerializers
 from django.db.models import F
 class OpticalControllerCreate(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
@@ -192,3 +192,10 @@ class ScheduleControllerList(generics.GenericAPIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Schedule.DoesNotExist:
             return Response({'error': 'Horario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+class ServiceController(viewsets.ModelViewSet):
+        queryset = Service.objects.all()
+        serializer_class= ServiceSerializers
+        permission_classes=[IsAuthenticated]
+        
+        http_method_names=['get','post','patch','delete']

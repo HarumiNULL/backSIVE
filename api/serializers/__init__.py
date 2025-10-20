@@ -6,3 +6,4 @@ from .test_serializers import TestSerializers, TestCreateSerializers, TestDelete
 from .catalogue_serializers import CatalogueCreateSerializers, CatalogueListSerializers
 from .state_serializers import StateSerializers
 from .comment_serializers import CommentSerializers
+from .service_serializers import ServiceSerializers
