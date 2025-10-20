@@ -5,3 +5,4 @@ from .questionary_serializers import QuestionaryCreateSerializers, QuestionaryLi
 from .test_serializers import TestSerializers, TestCreateSerializers, TestDeleteSerializers
 from .catalogue_serializers import CatalogueCreateSerializers, CatalogueListSerializers
 from .state_serializers import StateSerializers
+from .comment_serializers import CommentSerializers

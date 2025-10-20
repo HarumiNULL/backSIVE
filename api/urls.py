@@ -1,8 +1,13 @@
 from django.urls import path, include
 import api.controllers as ctrl
 from knox import views as knox_views
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register('comment', ctrl.CommentController, basename='comment')
 
 urlpatterns = [
+    path('', include(router.urls)),
     path("register/", ctrl.APIRegister.as_view(), name="register"),
     path("login/", ctrl.APILogin.as_view(), name="login"),
     path("optical/", ctrl.OpticalControllerCreate.as_view(), name="optical"),
