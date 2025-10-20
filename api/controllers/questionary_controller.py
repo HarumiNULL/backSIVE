@@ -3,6 +3,7 @@ from rest_framework import serializers
 from api.services import  QuestionaryService, QuestionService, OptionService
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
+from permissions import IsOwnerUser, IsAdminUser, IsRegularUser
 from api.serializers import QuestionaryCreateSerializers, QuestionaryListSerializers, QuestionCreateSerializers, QuestionListSerializers, OptionCreateSerializers, OptionListSerializers
 class QuestionaryControllerCreate(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
@@ -21,12 +22,14 @@ class QuestionaryControllerCreate(generics.GenericAPIView):
             return self.list_serializer_class
         return QuestionaryListSerializers
 
+    permission_classes = [IsRegularUser, IsOwnerUser, IsAdminUser]
     # GET → listar todas los cuestionarios
     def get(self, request, *args, **kwargs):
         questionarys = self.service.list_questionary()
         serializer = self.list_serializer_class(questionarys, many=True)
         return Response(serializer.data)
 
+    permission_classes = [IsAdminUser]
     # POST → crear nuevo cuestionario
     def post(self, request, *args, **kwargs):
         serializer = self.create_serializer_class(data=request.data)
@@ -42,8 +45,6 @@ class QuestionaryControllerCreate(generics.GenericAPIView):
 
 class QuestionaryControllerList(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
-    serializer_class = QuestionaryListSerializers
-    create_serializer_class = QuestionaryCreateSerializers
     queryset = Questionary.objects.all()
 
     def __init__(self, **kwargs):
@@ -54,7 +55,7 @@ class QuestionaryControllerList(generics.GenericAPIView):
         if self.request.method == 'PATCH':
             return QuestionaryCreateSerializers
         return QuestionaryListSerializers
-
+    permission_classes = [IsRegularUser, IsOwnerUser, IsAdminUser]
     # GET → listar una por id
     def get(self, request, *args, **kwargs):
         id_questionary = kwargs.get('pk', None)
@@ -65,6 +66,8 @@ class QuestionaryControllerList(generics.GenericAPIView):
             serializer = self.serializer_class(questionary)
             return Response(serializer.data)
 
+    permission_classes = [IsAdminUser]
+    # PATCH → actualizar cuestionario existente
     def patch(self, request, pk, *args, **kwargs):
         questionary_instance = self.service.list_questionary(pk)
         if not questionary_instance:
@@ -77,6 +80,7 @@ class QuestionaryControllerList(generics.GenericAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    permission_classes = [IsAdminUser]
     # DELETE → eliminar cuestionario existente
     def delete(self, request, pk, *args, **kwargs):
         questionary_instance = self.service.list_questionary(pk)
@@ -104,11 +108,15 @@ class QuestionControllerCreate(generics.GenericAPIView):
             return self.list_serializer_class
         return QuestionListSerializers
 
+    permission_classes = [IsRegularUser, IsOwnerUser, IsAdminUser]
+    # GET → listar todas las preguntas
     def get(self, request, *args, **kwargs):
         questions = self.service.list_question()
         serializer = self.list_serializer_class(questions, many=True)
         return Response(serializer.data)
 
+    permission_classes = [IsAdminUser]
+    # POST → crear nueva pregunta
     def post(self, request, *args, **kwargs):
         serializer = self.create_serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -124,7 +132,6 @@ class QuestionControllerList(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = QuestionListSerializers
     create_serializer_class = QuestionCreateSerializers
-    list_serializer_class = QuestionListSerializers
     delete_serializer_class = QuestionListSerializers
     queryset = Question.objects.all()
 
@@ -139,15 +146,19 @@ class QuestionControllerList(generics.GenericAPIView):
             return self.delete_serializer_class
         return QuestionListSerializers
 
+    permission_classes = [IsRegularUser, IsOwnerUser, IsAdminUser]
+    # GET → listar una por id
     def get(self, request, *args, **kwargs):
         id_question = kwargs.get('pk', None)
         if id_question:
             question = self.service.list_question(id_question)
             if not question:
                 return Response({"error": "Pregunta no encontrada"}, status=status.HTTP_404_NOT_FOUND)
-            serializer = self.list_serializer_class(question)
+            serializer = self.get_serializer_class(question)
             return Response(serializer.data)
 
+    permission_classes = [IsAdminUser]
+    # PATCH → actualizar pregunta existente
     def patch(self, request, pk, *args, **kwargs):
         question_instance = self.service.list_question(pk)
         if not question_instance:
@@ -160,6 +171,8 @@ class QuestionControllerList(generics.GenericAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    permission_classes = [IsAdminUser]
+    # DELETE → eliminar pregunta existente
     def delete(self, request, pk, *args, **kwargs):
         question_instance = self.service.list_question(pk)
         if not question_instance:
@@ -180,11 +193,15 @@ class OptionControllerCreate(generics.GenericAPIView):
             return OptionCreateSerializers
         return OptionListSerializers
 
+    permission_classes = [IsRegularUser, IsOwnerUser, IsAdminUser]
+    # GET → listar todas las opciones
     def get(self, request, *args, **kwargs):
       options = self.service.list_option()
       serializer = self.get_serializer_class()(options, many=True)
       return Response(serializer.data)
 
+    permission_classes = [IsAdminUser]
+    # POST → crear nueva opción
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -207,6 +224,8 @@ class OptionControllerList(generics.GenericAPIView):
         super().__init__(**kwargs)
         self.service = OptionService()
 
+    permission_classes = [IsRegularUser, IsOwnerUser, IsAdminUser]
+    # GET → listar una por id
     def get(self, request, *args, **kwargs):
         id_option = kwargs.get('pk', None)
         if id_option:
@@ -216,6 +235,8 @@ class OptionControllerList(generics.GenericAPIView):
             serializer = self.list_serializer_class(option)
             return Response(serializer.data)
 
+    permission_classes = [IsAdminUser]
+    # PATCH → actualizar opción existente
     def patch(self, request, pk, *args, **kwargs):
         option_instance = self.service.list_option(pk)
         if not option_instance:
@@ -228,6 +249,8 @@ class OptionControllerList(generics.GenericAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    permission_classes = [IsAdminUser]
+    # DELETE → eliminar opción existente
     def delete(self, request, pk, *args, **kwargs):
         option_instance = self.service.list_option(pk)
         if not option_instance:
