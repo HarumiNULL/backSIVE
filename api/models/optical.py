@@ -9,7 +9,7 @@ class Optical(models.Model):
     tel = models.CharField(max_length=11)
     city = models.ForeignKey(City, models.DO_NOTHING,db_column='id_city')
     email = models.EmailField(unique=True, max_length=80)
-    logo = models.CharField(max_length=600)
+    logo = models.ImageField(upload_to='optical/logos/', null=True, blank=True)
     descriptionOp = models.CharField(max_length=600, default='No hay descripción')
     user = models.ForeignKey(User, models.CASCADE, db_column='id')
     certCadecuacion = models.CharField(max_length=500)
@@ -17,9 +17,8 @@ class Optical(models.Model):
     latitud = models.FloatField(default=0.0)
     longitud = models.FloatField(default=0.0)
     view = models.PositiveIntegerField(default=0)
-    
-    
-    class Meta: 
+
+
+    class Meta:
         managed = True
         db_table = 'optical'
-    

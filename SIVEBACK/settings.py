@@ -85,7 +85,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
         'permissions.IsActiveUser',
     ],
-
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ]
 }
 
 # Database
@@ -102,6 +106,9 @@ DATABASES = {
     }
 }
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MEDIA_URL = '/media/'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

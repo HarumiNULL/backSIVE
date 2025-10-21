@@ -3,6 +3,7 @@ from rest_framework import serializers
 from api.services import  QuestionaryService, QuestionService, OptionService
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from permissions import IsOwnerUser, IsAdminUser, IsRegularUser
 from api.serializers import QuestionaryCreateSerializers, QuestionaryListSerializers, QuestionCreateSerializers, QuestionListSerializers, OptionCreateSerializers, OptionListSerializers
 class QuestionaryControllerCreate(generics.GenericAPIView):
@@ -14,7 +15,7 @@ class QuestionaryControllerCreate(generics.GenericAPIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = QuestionaryService()
-        
+
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return self.create_serializer_class
@@ -50,7 +51,7 @@ class QuestionaryControllerList(generics.GenericAPIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = QuestionaryService()
-    
+
     def get_serializer_class(self):
         if self.request.method == 'PATCH':
             return QuestionaryCreateSerializers
@@ -94,7 +95,7 @@ class QuestionControllerCreate(generics.GenericAPIView):
     serializer_class = QuestionListSerializers
     create_serializer_class = QuestionCreateSerializers
     list_serializer_class = QuestionListSerializers
-    
+
     queryset = Question.objects.all()
 
     def __init__(self, **kwargs):
@@ -117,10 +118,21 @@ class QuestionControllerCreate(generics.GenericAPIView):
 
     permission_classes = [IsAdminUser]
     # POST → crear nueva pregunta
+    @extend_schema(
+        request={
+            'multipart/form-data': {
+                'question': {'type': 'string'},
+                'image_question': {'type': 'string', 'format': 'binary'},
+                'questionary': {'type': 'integer'},
+            }
+        },
+        responses={200: QuestionListSerializers}
+    )
     def post(self, request, *args, **kwargs):
         serializer = self.create_serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             validated_data = serializer.validated_data
+            
             try:
                 question = self.service.create_question(validated_data)
                 return Response(self.create_serializer_class(question).data, status=status.HTTP_201_CREATED)
@@ -138,7 +150,7 @@ class QuestionControllerList(generics.GenericAPIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = QuestionService()
-    
+
     def get_serializer_class(self):
         if self.request.method == 'PATCH':
             return self.create_serializer_class
@@ -158,6 +170,16 @@ class QuestionControllerList(generics.GenericAPIView):
             return Response(serializer.data)
 
     permission_classes = [IsAdminUser]
+    @extend_schema(
+        request={
+            'multipart/form-data': {
+                'question': {'type': 'string'},
+                'image_question': {'type': 'string', 'format': 'binary'},
+                'questionary': {'type': 'integer'},
+            }
+        },
+        responses={200: QuestionListSerializers}
+    )
     # PATCH → actualizar pregunta existente
     def patch(self, request, pk, *args, **kwargs):
         question_instance = self.service.list_question(pk)
@@ -187,7 +209,7 @@ class OptionControllerCreate(generics.GenericAPIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = OptionService()
-    
+
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return OptionCreateSerializers
@@ -237,6 +259,7 @@ class OptionControllerList(generics.GenericAPIView):
 
     permission_classes = [IsAdminUser]
     # PATCH → actualizar opción existente
+
     def patch(self, request, pk, *args, **kwargs):
         option_instance = self.service.list_option(pk)
         if not option_instance:

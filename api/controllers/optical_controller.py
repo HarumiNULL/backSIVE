@@ -1,13 +1,16 @@
 from rest_framework import generics, status, permissions, viewsets
 from rest_framework.response import Response
 from permissions import IsOwnerUser, IsAdminUser, IsRegularUser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from api.services import OpticalService
-from api.models import Optical, Day, Hour, Schedule
+from api.models import Optical, Day, Hour, Schedule, Service, City
+from api.serializers import CitySerializers
 from api.serializers import OpticalListSerializers, OpticalCreateSerializers
 from api.serializers import DaySerializers
 from api.serializers import HourSerializers
 from api.serializers import ScheduleSerializers, ServiceSerializers
 from django.db.models import F
+from drf_spectacular.utils import extend_schema, OpenApiTypes
 class OpticalControllerCreate(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
 
@@ -29,7 +32,35 @@ class OpticalControllerCreate(generics.GenericAPIView):
         serializer = self.get_serializer_class()(optics, many=True)
         return Response(serializer.data)
 
+
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
     permission_classes = [IsOwnerUser, IsAdminUser]
+    @extend_schema(
+        # Sobrescribe el esquema para la carga de archivos
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    # Otros campos de texto
+                    'nameOp': {'type': 'string'},
+                    'address': {'type': 'string'},
+                    'tel': {'type': 'string'},
+                    'city': {'type': 'integer'},
+                    'email': {'type': 'string', 'format': 'email'},
+                    'certCadecuacion': {'type': 'string'},
+                    'certDispensacion': {'type': 'string'},
+                    'latitud': {'type': 'number', 'format': 'float'},
+                    'longitud': {'type': 'number', 'format': 'float'},
+
+                    # 💥 Esto fuerza el campo 'logo' a ser un selector de archivos
+                    'logo': {'type': 'string', 'format': 'binary'},
+
+                    # ... (otros campos de texto)
+                }
+            }
+        },
+        responses={201: OpticalListSerializers}
+    )
     # POST → crear nueva óptica
     def post(self, request, *args, **kwargs):
       serializer = self.get_serializer_class()(data=request.data)
@@ -67,6 +98,32 @@ class OpticalControllerList(generics.GenericAPIView):
             return Response(serializer.data)
 
     permission_classes = [IsOwnerUser, IsAdminUser]
+    @extend_schema(
+        # Sobrescribe el esquema para la carga de archivos
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    # Otros campos de texto
+                    'nameOp': {'type': 'string'},
+                    'address': {'type': 'string'},
+                    'tel': {'type': 'string'},
+                    'city': {'type': 'integer'},
+                    'email': {'type': 'string', 'format': 'email'},
+                    'certCadecuacion': {'type': 'string'},
+                    'certDispensacion': {'type': 'string'},
+                    'latitud': {'type': 'number', 'format': 'float'},
+                    'longitud': {'type': 'number', 'format': 'float'},
+
+                    # 💥 Esto fuerza el campo 'logo' a ser un selector de archivos
+                    'logo': {'type': 'string', 'format': 'binary'},
+
+                    # ... (otros campos de texto)
+                }
+            }
+        },
+        responses={201: OpticalListSerializers}
+    )
     # PUT → actualizar óptica existente
     def patch(self, request, pk, *args, **kwargs):
         try:
@@ -77,6 +134,8 @@ class OpticalControllerList(generics.GenericAPIView):
             return Response({"error": "Óptica no encontrada"}, status=status.HTTP_404_NOT_FOUND)
         serializer = self.serializer_class(optical, data=request.data, partial=True)
         if serializer.is_valid():
+            if 'logo' in serializer.validated_data and optical.logo:
+                optical.logo.delete(save=False)
             try:
                 optical_updated = self.service.update_optical(optical, serializer.validated_data)
                 return Response(self.serializer_class(optical_updated).data)
@@ -87,6 +146,7 @@ class OpticalControllerList(generics.GenericAPIView):
     permission_classes = [IsOwnerUser, IsAdminUser]
     # DELETE → eliminar óptica
     def delete(self, request, pk, *args, **kwargs):
+
         try:
             deleted = self.service.delete_optical(pk)
             if deleted:
@@ -95,6 +155,14 @@ class OpticalControllerList(generics.GenericAPIView):
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+class CityController(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class= CitySerializers
+
+    def get(self,request, *args, **kwargs):
+        cities = City.objects.all()
+        serializer = self.serializer_class(cities, many=True)
+        return Response(serializer.data)
 
 class DayController(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
@@ -197,6 +265,4 @@ class ScheduleControllerList(generics.GenericAPIView):
 class ServiceController(viewsets.ModelViewSet):
         queryset = Service.objects.all()
         serializer_class= ServiceSerializers
-        permission_classes=[IsAuthenticated]
-
         http_method_names=['get','post','patch','delete']

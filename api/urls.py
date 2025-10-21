@@ -1,4 +1,6 @@
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 import api.controllers as ctrl
 from knox import views as knox_views
 from rest_framework.routers import DefaultRouter
@@ -31,6 +33,6 @@ urlpatterns = [
     path('test/<int:pk>/',ctrl.TestControllerList.as_view(), name='test_detail'),
     path('catalogue/', ctrl.CatalogueControllerCreate.as_view(), name='catalogue'),
     path('catalogue/<int:pk>/', ctrl.CatalogueControllerList.as_view(), name='catalogue_detail'),
-    path("city/", ctrl.CityController.as_view(), name = "citys"),
+    path("city/", ctrl.CityController.as_view(), name = "city"),
     path("state/",ctrl.StateController.as_view(), name = "estado")
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
