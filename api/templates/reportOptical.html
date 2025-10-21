@@ -1,0 +1,183 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ titulo }}</title>
+    <style>
+        /* === CONFIGURACIÓN GENERAL === */
+        @page { size: A4; margin: 2cm; }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            color: #333;
+        }
+
+        /* === ENCABEZADO === */
+        .header-table {
+            width: 100%;
+            background-color: #5b3a98;
+            color: white;
+            border: none;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        .header-table td {
+            border: none;
+            padding: 12px;
+        }
+        .header-logo {
+            width: 70px;
+            text-align: center;
+        }
+        .header-logo img {
+            width: 55px;
+            height: 55px;
+        }
+        .header-title {
+            text-align: left;
+        }
+        .header-title h1 {
+            margin: 0;
+            font-size: 18pt;
+        }
+
+        /* === INFORMACIÓN GENERAL === */
+        .info-table {
+            width: 100%;
+            background-color: #f5f0ff;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .info-table td {
+            padding: 10px;
+            border: none;
+        }
+        .admin-cell {
+            border-left: 4px solid #9981ba;
+        }
+        .info-table strong {
+            color: #333;
+        }
+
+        /* === TABLA DE DATOS === */
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 25px;
+        }
+        .data-table th {
+            background-color: #9981ba;
+            color: white;
+            font-weight: bold;
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        .data-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        .data-table tr:nth-child(even) {
+            background-color: #f0e6ff;
+        }
+        .data-table tr:hover {
+            background-color: #e4d4ff;
+        }
+
+        /* === TOTAL === */
+        .total-box-container {
+            text-align: right;
+            margin-top: 20px;
+        }
+        .total-box {
+            display: inline-block;
+            padding: 10px 15px;
+            border: 2px solid #71279c;
+            background-color: #f9f1ff;
+            border-radius: 5px;
+        }
+        .total-box h3 {
+            margin: 0;
+            color: #71279c;
+            font-size: 11pt;
+        }
+
+        /* === PIE DE PÁGINA === */
+        .footer {
+            text-align: center;
+            font-size: 8pt;
+            color: #777;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ENCABEZADO -->
+    <table class="header-table">
+        <tr>
+            <td class="header-logo">
+                <!-- ✅ IMPORTANTE: Usa ruta absoluta para que xhtml2pdf la reconozca -->
+                <img src="{{ STATIC_ROOT }}/img/logo.png" alt="Logo">
+            </td>
+            <td class="header-title">
+                <h1>{{ titulo }}</h1>
+            </td>
+        </tr>
+    </table>
+
+    <!-- INFORMACIÓN GENERAL -->
+    <table class="info-table">
+        <tr>
+            <td class="admin-cell"><strong>Administrador:</strong> {{ nombre_admin }}</td>
+            <td style="text-align: right;"><strong>Fecha:</strong> {{ fecha_generacion|date:"d/m/Y H:i" }}</td>
+        </tr>
+    </table>
+
+    <!-- TABLA DE ÓPTICAS -->
+    <h2 style="color: #5b3a98;">Detalle de Ópticas</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 5%;">ID</th>
+                <th style="width: 25%;">Nombre</th>
+                <th style="width: 25%;">Email</th>
+                <th style="width: 15%;">Teléfono</th>
+                <th style="width: 15%;">Ciudad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for optica in opticas %}
+            <tr>
+                <td>{{ optica.pk|default:"" }}</td>
+                <td>{{ optica.nameOp|default:"" }}</td>
+                <td>{{ optica.email|default:"" }}</td>
+                <td>{{ optica.tel|default:"" }}</td>
+                <td>{{ optica.city.name|default:"" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align:center; color:gray; font-style:italic;">
+                    No se encontraron ópticas registradas.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- TOTAL -->
+    <div class="total-box-container">
+        <div class="total-box">
+            <h3>Total de Ópticas: {{ total_opticas }}</h3>
+        </div>
+    </div>
+
+    <!-- PIE -->
+    <div class="footer">
+        <p>Reporte generado automáticamente por el sistema.</p>
+    </div>
+
+</body>
+</html>

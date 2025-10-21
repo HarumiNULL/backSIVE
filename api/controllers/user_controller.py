@@ -36,7 +36,7 @@ class APILogin(generics.GenericAPIView):
             if user:
                 _, token = AuthToken.objects.create(user)
                 return Response({
-                    'user': LoginSerializers(user).data,
+                    'user': RegisterSerializers(user).data,
                     'token': token
                 })
             return Response({'error': 'Invalid credentials'}, status=401)
