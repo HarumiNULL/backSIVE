@@ -13,7 +13,7 @@ from django.db.models import F
 from drf_spectacular.utils import extend_schema, OpenApiTypes
 class OpticalControllerCreate(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
-
+    
     def get_queryset(self):
         return Optical.objects.all()
 
