@@ -12,4 +12,6 @@ class StateController(generics.GenericAPIView):
         states = State.objects.all()
         serializer = self.serializer_class(states, many=True)
         return Response(serializer.data)
+    
+    
 

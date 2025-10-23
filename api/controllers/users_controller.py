@@ -8,4 +8,4 @@ class UsersController(viewsets.ModelViewSet):
     serializer_class = UsersSerializers
     permission_classes= [IsAdminUser]
     
-    http_method_names =['get','post','delete']
+    http_method_names =['get','post','patch']
