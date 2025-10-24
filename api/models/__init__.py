@@ -15,3 +15,4 @@ from .recommendation import Recommendation
 from .comment import Comment
 from .catalogue import Catalogue
 from .state import State
+from .product import Product

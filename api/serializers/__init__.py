@@ -8,3 +8,4 @@ from .state_serializers import StateSerializers
 from .comment_serializers import CommentSerializers
 from .service_serializers import ServiceSerializers
 from .users_serializers import UsersSerializers
+from .product_serializers import ProductSerializers

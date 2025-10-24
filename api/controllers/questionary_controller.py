@@ -150,7 +150,6 @@ class QuestionControllerCreate(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class QuestionControllerList(generics.GenericAPIView):
-    permission_classes = [permissions.AllowAny]
     serializer_class = QuestionListSerializers
     create_serializer_class = QuestionCreateSerializers
     delete_serializer_class = QuestionListSerializers
@@ -161,15 +160,16 @@ class QuestionControllerList(generics.GenericAPIView):
         self.service = QuestionService()
 
     def get_permissions(self):
-        if self.request.method == 'PATCH':
-            permission_classes = [IsAdminUser]
-        elif self.request.method == 'DELETE':
-            permission_classes[IsAdminUser]
-        elif self.request.method == 'GET':
-            permission_classes = [IsRegularUser | IsOwnerUser | IsAdminUser]
-        else:
-            permission_classes = [permissions.IsAuthenticated]
-        return [permission() for permission in permission_classes]
+      if self.request.method == 'PATCH':
+        permission_classes = [IsAdminUser]
+      elif self.request.method == 'DELETE':
+        permission_classes = [IsAdminUser]
+      elif self.request.method == 'GET':
+        permission_classes = [IsRegularUser | IsOwnerUser | IsAdminUser]
+      else:
+        permission_classes = [permissions.IsAuthenticated]
+      return [permission() for permission in permission_classes]
+
 
     # GET → listar una por id
     def get(self, request, *args, **kwargs):
@@ -204,7 +204,6 @@ class QuestionControllerList(generics.GenericAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    permission_classes = [IsAdminUser]
     # DELETE → eliminar pregunta existente
     def delete(self, request, pk, *args, **kwargs):
         question_instance = self.service.list_question(pk)

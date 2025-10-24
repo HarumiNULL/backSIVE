@@ -39,5 +39,6 @@ urlpatterns = [
     path('catalogue/<int:pk>/', ctrl.CatalogueControllerList.as_view(), name='catalogue_detail'),
     path("city/", ctrl.CityController.as_view(), name = "city"),
     path("state/",ctrl.StateController.as_view(), name = "estado"),
-    path("optical/report/",ctrl.createReport.as_view(), name = 'optical-report-pdf')
+    path("optical/report/",ctrl.createReport.as_view(), name = 'optical-report-pdf'),
+    path('product/',ctrl.ProductController.as_view(), name= 'Product')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

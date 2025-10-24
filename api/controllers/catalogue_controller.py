@@ -2,12 +2,12 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from permissions import IsOwnerUser, IsAdminUser, IsRegularUser
 from api.services import CatalogueService
-from api.models import Catalogue
-from api.serializers import CatalogueListSerializers, CatalogueCreateSerializers
+from api.models import Catalogue, Product
+from api.serializers import CatalogueListSerializers, CatalogueCreateSerializers, ProductSerializers
 from drf_spectacular.utils import extend_schema
 
 class CatalogueControllerCreate(generics.GenericAPIView):
-
+    serializer_class= CatalogueCreateSerializers
     def get_queryset(self):
         return Catalogue.objects.all()
 
@@ -35,7 +35,7 @@ class CatalogueControllerCreate(generics.GenericAPIView):
                 'type': 'object',
                 'properties': {
                     # Otros campos de texto
-                    'nameP': {'type': 'string'},
+                    'nameP': {'type': 'integer'},
                     'description': {'type': 'string'},
                     'image': {'type': 'string', 'format': 'binary'},
                     'price': {'type': 'integer'},
@@ -91,7 +91,7 @@ class CatalogueControllerList(generics.GenericAPIView):
                 'type': 'object',
                 'properties': {
                     # Otros campos de texto
-                    'nameP': {'type': 'string'},
+                    'nameP': {'type': 'integer'},
                     'description': {'type': 'string'},
                     'image': {'type': 'string', 'format': 'binary'},
                     'price': {'type': 'integer'},
@@ -129,3 +129,13 @@ class CatalogueControllerList(generics.GenericAPIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        
+class ProductController(generics.GenericAPIView):
+    serializer_class = ProductSerializers
+    queryset= Product.objects.all()
+    
+    permission_classes = [IsOwnerUser| IsAdminUser|IsRegularUser]
+    def get(self, request,*args,**kwargs):
+        product = Product.objects.all()
+        serializer= ProductSerializers(product, many=True)
+        return Response(serializer.data)
