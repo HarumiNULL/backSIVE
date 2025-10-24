@@ -12,6 +12,8 @@ from api.serializers import ScheduleSerializers, ServiceSerializers
 from django.db.models import F
 from drf_spectacular.utils import extend_schema, OpenApiTypes
 class OpticalControllerCreate(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = OpticalCreateSerializers
     
     def get_queryset(self):
         return Optical.objects.all()
@@ -19,8 +21,8 @@ class OpticalControllerCreate(generics.GenericAPIView):
     def get_permissions(self):
         if self.request.method == 'POST':
             permission_classes = [IsAdminUser | IsOwnerUser]
-        elif self.request.method == 'GET':
-            permission_classes = [IsRegularUser | IsOwnerUser | IsAdminUser]
+        #elif self.request.method == 'GET':
+           # permission_classes = [IsRegularUser | IsOwnerUser | IsAdminUser]
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
@@ -29,6 +31,7 @@ class OpticalControllerCreate(generics.GenericAPIView):
         self.service = OpticalService()
         super().__init__(**kwargs)
 
+    permission_classes = [IsRegularUser | IsOwnerUser | IsAdminUser]
     def get(self, request, *args, **kwargs):
         optics = self.service.repository.list()
         serializer = self.get_serializer_class()(optics, many=True)
@@ -76,7 +79,6 @@ class OpticalControllerCreate(generics.GenericAPIView):
       return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class OpticalControllerList(generics.GenericAPIView):
-    permission_classes = [permissions.AllowAny]
     serializer_class = OpticalListSerializers
     queryset = Optical.objects.all()
 
@@ -95,6 +97,7 @@ class OpticalControllerList(generics.GenericAPIView):
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
+    permission_classes = [IsRegularUser | IsOwnerUser | IsAdminUser]
     # GET → listar una por id
     def get(self, request, *args, **kwargs):
         id_optical = kwargs.get('pk', None)
@@ -178,7 +181,7 @@ class OpticalTopViewedController(generics.GenericAPIView):
         return Response(serializer.data)
 
 class OpticalByCityallController(generics.GenericAPIView):
-    permission_classes = [IsAdminUser| IsOwnerUser]
+    permission_classes = [IsAdminUser| IsOwnerUser|IsRegularUser]
     serializer_class = OpticalByAllCitySerializers
 
     def __init__(self, **kwargs):
@@ -190,6 +193,7 @@ class OpticalByCityallController(generics.GenericAPIView):
         city_data = self.service.get_city_distribution_data()
         serializer = self.serializer_class(city_data, many=True)
         return Response(serializer.data)
+    
 class CityController(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class= CitySerializers
@@ -203,14 +207,14 @@ class DayController(generics.GenericAPIView):
     serializer_class = DaySerializers
     queryset = Day.objects.all()
 
-    permission_classes = [IsOwnerUser| IsAdminUser]
+    permission_classes = [IsOwnerUser| IsAdminUser|IsRegularUser]
     def get(self, request, *args, **kwargs):
         days = Day.objects.all()
         serializer = DaySerializers(days, many=True)
         return Response(serializer.data)
 
 class HourController(generics.GenericAPIView):
-    permission_classes = [IsOwnerUser| IsAdminUser]
+    permission_classes = [IsOwnerUser| IsAdminUser |IsRegularUser]
     serializer_class = HourSerializers
     queryset = Hour.objects.all()
 
@@ -232,14 +236,14 @@ class ScheduleControllerCreate(generics.GenericAPIView):
             return ScheduleSerializers
         return ScheduleSerializers
 
-    permissions_classes = [IsOwnerUser|IsAdminUser]
+    permissions_classes = [IsOwnerUser|IsAdminUser| IsRegularUser]
    # 🔹 GET → Listar todos
     def get(self, request, *args, **kwargs):
       schedules = Schedule.objects.all()
       serializer = ScheduleSerializers(schedules, many=True)
       return Response(serializer.data)
 
-    permissions_classes = [IsOwnerUser| IsAdminUser]
+    permissions_classes = [IsOwnerUser| IsAdminUser |IsRegularUser]
     # 🔹 POST → Crear nuevo horario
     def post(self, request, *args, **kwargs):
         serializer = ScheduleSerializers(data=request.data)
@@ -261,7 +265,7 @@ class ScheduleControllerList(generics.GenericAPIView):
             return ScheduleSerializers
         return ScheduleSerializers
 
-    permission_classes = [IsOwnerUser| IsAdminUser]
+    permission_classes = [IsOwnerUser| IsAdminUser | IsRegularUser]
     def get(self, request, *args, **kwargs):
         id_schedule = kwargs.get('pk', None)
         if id_schedule:
@@ -299,4 +303,5 @@ class ScheduleControllerList(generics.GenericAPIView):
 class ServiceController(viewsets.ModelViewSet):
         queryset = Service.objects.all()
         serializer_class= ServiceSerializers
+        permission_classes = [IsOwnerUser| IsAdminUser]
         http_method_names=['get','post','patch','delete']
