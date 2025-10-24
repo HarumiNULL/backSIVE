@@ -97,7 +97,7 @@ class OpticalControllerList(generics.GenericAPIView):
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
-    permission_classes = [IsRegularUser | IsOwnerUser | IsAdminUser]
+  
     # GET → listar una por id
     def get(self, request, *args, **kwargs):
         id_optical = kwargs.get('pk', None)

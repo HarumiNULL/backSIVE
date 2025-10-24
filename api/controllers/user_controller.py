@@ -35,7 +35,7 @@ class APILogin(generics.GenericAPIView):
 
             user = authenticate(request, email=email, password=password)
             if user:
-                if User.state == 2:
+                if user.state == 2:
                     return Response({"error": "Has sido bloqueado por acciones sospechosas comuniquese con el equipo de desarrollo"})
                 elif User.state== 4: 
                     return Response(
