@@ -9,13 +9,15 @@ from api.serializers import OpticalListSerializers, OpticalCreateSerializers, Op
 from api.serializers import DaySerializers
 from api.serializers import HourSerializers
 from api.serializers import ScheduleSerializers, ServiceSerializers
+from django_filters.rest_framework import DjangoFilterBackend
+from api.filters.schudulefilter import ScheduleFilter
 from django.db.models import F
-from drf_spectacular.utils import extend_schema, OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiTypes, OpenApiParameter
 class OpticalControllerCreate(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = OpticalCreateSerializers
     list_serializer_class= OpticalListSerializers
-    
+
     def get_queryset(self):
         return Optical.objects.all()
 
@@ -86,7 +88,7 @@ class OpticalControllerList(generics.GenericAPIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = OpticalService()
-    
+
     def get_permissions(self):
         if self.request.method == 'PATCH':
             permission_classes = [IsAdminUser | IsOwnerUser]
@@ -98,7 +100,7 @@ class OpticalControllerList(generics.GenericAPIView):
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
-  
+
     # GET → listar una por id
     def get(self, request, *args, **kwargs):
         id_optical = kwargs.get('pk', None)
@@ -194,7 +196,7 @@ class OpticalByCityallController(generics.GenericAPIView):
         city_data = self.service.get_city_distribution_data()
         serializer = self.serializer_class(city_data, many=True)
         return Response(serializer.data)
-    
+
 class CityController(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class= CitySerializers
@@ -228,6 +230,8 @@ class ScheduleControllerCreate(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = ScheduleSerializers
     queryset = Schedule.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ScheduleFilter
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -237,17 +241,34 @@ class ScheduleControllerCreate(generics.GenericAPIView):
             return ScheduleSerializers
         return ScheduleSerializers
 
-    permissions_classes = [IsOwnerUser|IsAdminUser| IsRegularUser]
-   # 🔹 GET → Listar todos
-    def get(self, request, *args, **kwargs):
-      schedules = Schedule.objects.all()
-      serializer = ScheduleSerializers(schedules, many=True)
-      return Response(serializer.data)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        for backend in list(self.filter_backends):
+            queryset = backend().filter_queryset(self.request, queryset, self)
+        return queryset
 
-    permissions_classes = [IsOwnerUser| IsAdminUser |IsRegularUser]
-    # 🔹 POST → Crear nuevo horario
+    # MÉTODO GET: COMBINADO Y DOCUMENTADO
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='optical',
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description='Filtra los horarios por el ID de la óptica a la que pertenecen.',
+                required=False
+            ),
+        ]
+    )
+    def get(self, request, *args, **kwargs):
+        # 1. Obtiene el queryset ya filtrado
+        queryset = self.get_queryset()
+        # 2. Usa el método canónico de DRF (get_serializer)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    # MÉTODO POST
     def post(self, request, *args, **kwargs):
-        serializer = ScheduleSerializers(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
