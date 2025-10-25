@@ -9,7 +9,7 @@ class OpticalCreateSerializers(serializers.ModelSerializer):
 class OpticalListSerializers(serializers.ModelSerializer):
   class Meta:
     model = Optical
-    fields = ['nameOp', 'address', 'tel', 'city', 'email', 'logo', 'user', 'certCadecuacion', 'certDispensacion', 'latitud', 'longitud', 'view']
+    fields = ['id_optical', 'nameOp', 'address', 'tel', 'city', 'email', 'logo', 'user', 'certCadecuacion', 'certDispensacion', 'latitud', 'longitud', 'view']
     read_only_fields = ['id_optical', 'view', 'user']
 
 class OpticalTopViewedSerializers(serializers.Serializer):
