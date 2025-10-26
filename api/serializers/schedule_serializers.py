@@ -21,7 +21,7 @@ class ScheduleSerializers(serializers.ModelSerializer):
     day_id = serializers.PrimaryKeyRelatedField(queryset=Day.objects.all(), source='day', write_only=True)
     hour_aper_id = serializers.PrimaryKeyRelatedField(queryset=Hour.objects.all(), source='hour_aper', write_only=True)
     hour_close_id = serializers.PrimaryKeyRelatedField(queryset=Hour.objects.all(), source='hour_close', write_only=True)
-    optical_id = serializers.PrimaryKeyRelatedField(queryset=Optical.objects.all(), source='optical', write_only=True)
+    optical_id = serializers.PrimaryKeyRelatedField(queryset=Optical.objects.all(), source='optical', write_only=False)
     class Meta: 
         model = Schedule
         fields = ['id_schedule','day','hour_aper','hour_close', 'day_id','hour_aper_id','hour_close_id', 'optical_id']
