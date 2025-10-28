@@ -15,7 +15,7 @@ class TestCreateSerializers(serializers.ModelSerializer):
     answer_id= serializers.IntegerField()#descomentado por Esteban
     class Meta: 
         model = Test
-        fields = ['id_test', 'questionary_id', 'question_id', 'user_id', 'date_test']
+        fields = ['id_test', 'questionary_id', 'question_id', 'user_id', 'date_test','answer_id']
         read_only_fields = ['id_test']
         
 class TestDeleteSerializers(serializers.ModelSerializer):
