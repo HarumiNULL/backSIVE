@@ -44,4 +44,5 @@ urlpatterns = [
     path('admin/pending-owners/', ctrl.admin_controller.pending_optics, name='get_pending_optic_owners'),
     path('admin/approve-owner/<int:optic_id>/', ctrl.admin_controller.approve_optic_owner, name='approve_optic_owner'),
     path('admin/reject-owner/<int:optic_id>/', ctrl.admin_controller.reject_optic_owner, name='reject_optic_owner'),
+    path('admin/user-status/', ctrl.admin_controller.user_status, name='user_status'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
