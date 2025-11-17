@@ -29,7 +29,7 @@ SECRET_KEY = "django-insecure-axlo*3hmaom_^%g#lcy#zg41w75ut)4e9i*#%_ql&-is-8lft5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['Localhost','127.0.0.1','backsivedeploy-production-4511.up.railway.app']
+ALLOWED_HOSTS = ['Localhost','127.0.0.1','backsivedeploy-production-4511.up.railway.app','backsive-production.up.railway.app']
 
 
 # Application definition
@@ -176,7 +176,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = [
    "http://localhost:5173",
    "https://sivedeploy-1.onrender.com",
-   "https://sive-00qf.onrender.com"
+   "https://sive-00qf.onrender.com",
+
    ]
 
 SPECTACULAR_SETTINGS = {
