@@ -27,9 +27,9 @@ load_dotenv()
 SECRET_KEY = "django-insecure-axlo*3hmaom_^%g#lcy#zg41w75ut)4e9i*#%_ql&-is-8lft5"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['Localhost','127.0.0.1','backsivedeploy-production-4511.up.railway.app','backsive-production.up.railway.app']
+DEBUG = False
+ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = ['Localhost','127.0.0.1','backsivedeploy-production-4511.up.railway.app','backsive-production.up.railway.app']
 
 
 # Application definition
@@ -167,7 +167,7 @@ DEFAULT_FROM_EMAIL = "sivebot.2025@gmail.com"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles") 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
