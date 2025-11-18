@@ -1,0 +1,32 @@
+services:
+- type: web
+  name: backSIVE
+  env: python
+  buildCommand: "./build.sh" # Usaremos un script de build para mayor claridad
+  startCommand: "gunicorn SIVEBACK.wsgi:application --bind 0.0.0.0:$PORT" # Reemplaza 'mi_proyecto' con el nombre de tu proyecto
+  plan: starter # Elige el plan adecuado
+  envVars:
+    - key: DATABASE_URL
+        value: "postgresql://postgres:AZPOPhKATngSVJGeXWJXfymOOIsSBqIW@ballast.proxy.rlwy.net:23140/railway"
+    - key: SECRET_KEY
+        generateValue: true
+    - key: DEBUG
+        value: "True" # Asegúrate de que DEBUG esté desactivado en producción    
+    - key: WEB_CONCURRENCY
+        value: 4 # Número de workers de Gunicorn
+    - key: ALLOWED_HOSTS
+        value: "mi-django-api.onrender.com" # Esto se actualizará en Render automáticament
+    - key: EMAIL_BACKEND
+        value: "django.core.mail.backends.console.EmailBackend" # Configuración de email para desarrollo
+    - key: EMAIL_HOST
+        value: "smtp.example.com" # Configura tu servidor SMTP real para producción
+    - key: EMAIL_PORT
+        value: "587"
+    - key: EMAIL_USE_TLS
+        value: "True"
+    - key: EMAIL_HOST_USER
+        value: "sivebot2025@gmail.com"
+    - key: EMAIL_PASSWORD
+        value: "eycjoblgnmormpcr"
+    - key: DEFAULT_FROM_EMAIL
+        value: "sivebot.2025@gmail.com"
