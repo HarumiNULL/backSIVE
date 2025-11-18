@@ -190,6 +190,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://sive-00qf.onrender.com",
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'SIVEBACK API',
