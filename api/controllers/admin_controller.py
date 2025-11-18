@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from api.models.user import User
 from api.serializers import UsersSerializers , OpticalListSerializers
 from api.models import Optical , User, Role
+import permissions
 
 # Listar ópticas pendientes
 @api_view(['GET'])
@@ -63,3 +64,18 @@ def reject_optic_owner(request, optic_id):
 
     return Response({"message": "Dueño rechazado correctamente"}, status=200)
 
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsActiveUser])
+def user_status(request):
+    user = request.user
+    optic = Optical.objects.filter(user=user).first()
+
+    return Response({
+        "is_verified_owner": user.is_verified_owner,
+        "optic": {
+            "is_verified": optic.is_verified,
+            "name": optic.nameOp,
+        } if optic else None
+    })
